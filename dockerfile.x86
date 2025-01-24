@@ -1,0 +1,39 @@
+FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG PYTHON_VERSION="3.12"
+ARG NODE_VERSION="20"
+ARG PYTHON_ENV_NAME="codebase"
+ARG TARGET_WORKDIR="codebase"
+
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    git \
+    tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -fs /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
+    dpkg-reconfigure --frontend noninteractive tzdata
+
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh && \
+    bash miniconda.sh -b -p /miniconda && \
+    rm miniconda.sh
+
+ENV PATH /miniconda/bin:$PATH
+
+RUN conda create --name ${PYTHON_ENV_NAME} python=${PYTHON_VERSION} -y
+RUN conda init bash && echo "conda activate ${PYTHON_ENV_NAME}" >> ~/.bashrc 
+
+RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
+    apt-get update && apt-get install -y nodejs redis-server
+
+RUN apt-get install -f
+
+RUN npm install pm2 -g
+
+COPY . /${TARGET_WORKDIR}
+WORKDIR /${TARGET_WORKDIR}
+RUN conda run -n ${PYTHON_ENV_NAME} pip install -r requirements.txt
+
+CMD ["/bin/bash"]
