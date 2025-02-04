@@ -1,3 +1,4 @@
 .env
 __pycache__/
 app_fastapi/utilities/parser/v3/docx_parser/docx_parser.py
+storage/*

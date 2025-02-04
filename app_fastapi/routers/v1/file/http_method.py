@@ -3,6 +3,8 @@ from typing import Annotated, Dict, Optional
 from app_fastapi.configurations.configuration import get_settings
 from fastapi import UploadFile, File
 from app_fastapi.utilities.parser.v3.parsers import Parsers as ParsersV3
+from app_fastapi.utilities.etc.save_chunks_to_files import save_chunks_to_files
+import os
 
 
 async def http_post(
@@ -13,12 +15,13 @@ async def http_post(
     """
     full_string_list = []
 
-    filename_extension: str = file.filename.split(".")[-1]
+    filename, extension = os.path.splitext(file.filename)
+
     file_data = await file.read()
 
     parsers = ParsersV3
 
-    if filename_extension.lower() == "docx":
+    if extension.lower() == ".docx":
         parser = parsers.docx_parser(file_data)
     else:
         raise HTTPException(status_code=500, detail={"detail": "Error"})
@@ -33,5 +36,9 @@ async def http_post(
     # 공백 제거
     full_string = "".join(full_string_list)
 
-    print(full_string)
+    print(len(full_string))
+    save_chunks_to_files(
+        full_string,
+        filename,
+    )
     return True
