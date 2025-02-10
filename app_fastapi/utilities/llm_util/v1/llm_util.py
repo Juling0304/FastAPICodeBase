@@ -8,7 +8,7 @@ class Clients:
     @classmethod
     def client_openai(cls):
         return ChatOpenAI(
-            model="gpt-4",
+            model="gpt-3.5-turbo-1106",
             temperature=0.7,
             openai_api_key=get_settings().GPT_API_KEY,
         )

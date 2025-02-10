@@ -4,43 +4,87 @@ from app_fastapi.configurations.configuration import get_settings
 from fastapi import UploadFile, File
 from app_fastapi.utilities.llm_util.v1.llm_util import Clients
 from langchain.schema.runnable import RunnableSequence
-from app_fastapi.prompts.extract_keyword import prompt as extract_prompt
+from app_fastapi.prompts.extract_keyword import (
+    cn_prompt as extract_cn_prompt,
+    ko_prompt as extract_ko_prompt,
+)
 import os, json
+import pandas as pd
 
 
-async def http_post():
+async def http_post_cn():
     """
     테스트
     """
     chunk_files = sorted(os.listdir("storage/chunks"))
-    print(chunk_files)
 
     full_chunk = ""
+    all_dict = {}
+    i = 0
     for each in chunk_files:
-        if each.endswith(".txt"):  # Check if the file is a .txt file
+        print(each)
+        if each.endswith(".txt"):
             file_path = os.path.join("storage/chunks", each)
             with open(file_path, "r", encoding="utf-8") as f:
                 full_chunk = f.read()
 
             client = Clients.client_openai()
-            chain = extract_prompt | client
+            chain = extract_cn_prompt | client
             response = chain.invoke({"long_text": full_chunk})
-            print(response.content)
-            print(type(response.content))
-            res_dict = json.loads(response.content)
-            print(res_dict)
-        break
-    # client = Clients.client_openai()
+            try:
+                res_dict = json.loads(response.content)
+            except:
+                print("재작업 필요")
+                res_dict = {}
+            all_dict.update(res_dict)
+            # print(all_dict)
+        # if i >= 76:
+        #     break
 
-    # from langchain.prompts import PromptTemplate
+        # i += 1
 
-    # prompt = PromptTemplate(
-    #     input_variables=["long_text"],
-    #     template=extract_prompt,
-    # )
+    if all_dict:
+        df = pd.DataFrame(list(all_dict.items()), columns=["중국어", "한국어"])
 
-    # chain = prompt | client
-    # response = chain.invoke({"topic": "사과"})
+        df.to_excel("storage/chunks/keyword_cn.xlsx", index=False)
 
-    # print(response)
+    return True
+
+
+async def http_post_ko():
+    """
+    테스트
+    """
+    chunk_files = sorted(os.listdir("storage/chunks"))
+
+    full_chunk = ""
+    all_dict = {}
+    i = 0
+    for each in chunk_files:
+        print(each)
+        if each.endswith(".txt"):
+            file_path = os.path.join("storage/chunks", each)
+            with open(file_path, "r", encoding="utf-8") as f:
+                full_chunk = f.read()
+
+            client = Clients.client_openai()
+            chain = extract_ko_prompt | client
+            response = chain.invoke({"long_text": full_chunk})
+            try:
+                res_dict = json.loads(response.content)
+            except:
+                print("재작업 필요")
+                res_dict = {}
+            all_dict.update(res_dict)
+            # print(all_dict)
+        # if i >= 10:
+        #     break
+
+        # i += 1
+
+    if all_dict:
+        df = pd.DataFrame(list(all_dict.items()), columns=["중국어", "한국어"])
+
+        df.to_excel("storage/chunks/keyword_ko.xlsx", index=False)
+
     return True
