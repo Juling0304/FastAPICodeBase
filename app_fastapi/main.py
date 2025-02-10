@@ -14,7 +14,11 @@ app = FastAPI(
     # lifespan=app_lifespan,
     servers=None,
     docs_url="/",
-    openapi_tags=[{"name": tags.FILE_TAG}, {"name": tags.KEYWORD_TAG}],
+    openapi_tags=[
+        {"name": tags.FILE_TAG},
+        {"name": tags.KEYWORD_TAG},
+        {"name": tags.SUGGEST_TAG},
+    ],
 )
 
 app.add_middleware(
