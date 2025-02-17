@@ -18,3 +18,10 @@ router.post(
     name="keyword",
     # response_model=ResponseTest,
 )(http_method.http_post_ko)
+
+router.post(
+    path=urls.ENDPOINT + "/en",
+    tags=[tags.KEYWORD_TAG],
+    name="keyword",
+    # response_model=ResponseTest,
+)(http_method.http_post_en)

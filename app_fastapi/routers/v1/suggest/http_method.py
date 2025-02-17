@@ -2,9 +2,11 @@ from fastapi import Depends, HTTPException
 from typing import Annotated, Dict, Optional
 from app_fastapi.configurations.configuration import get_settings
 from fastapi import UploadFile, File
-from app_fastapi.utilities.parser.v3.parsers import Parsers as ParsersV3
 from app_fastapi.utilities.etc.save_chunks_to_files import save_chunks_to_files
-import os, pandas as pd
+from app_fastapi.utilities.llm_util.v1.llm_util import Clients
+from langchain.schema.runnable import RunnableSequence
+from app_fastapi.prompts.suggest_keyword import suggest_prompt
+import os, pandas as pd, json
 
 
 async def http_post(
@@ -18,7 +20,7 @@ async def http_post(
 
     keyword_dict = dict(
         zip(
-            keyword_df["중국어"],
+            keyword_df["한국어"],
             [
                 f"{ko} - {cn}"
                 for ko, cn in zip(keyword_df["한국어"], keyword_df["중국어"])
@@ -26,12 +28,35 @@ async def http_post(
         )
     )
 
-    excel_df["matched_ko"] = excel_df["target"].apply(
-        lambda target: ",".join(
-            [ko_cn for cn, ko_cn in keyword_dict.items() if cn in target]
-        )
+    excel_df["search"] = excel_df["source"].apply(
+        lambda source: [ko_cn for ko, ko_cn in keyword_dict.items() if ko in source]
     )
 
-    excel_df.to_excel("storage/suggest_test.xlsx", index=False)
+    search_df = excel_df[excel_df["search"].notna()]
+    json_str = search_df.to_json(orient="records", force_ascii=False)
+    list_data = json.loads(json_str)
+    for each in list_data:
+
+        client = Clients.client_openai()
+        chain = suggest_prompt | client
+        response = chain.invoke(
+            {"korean_text": each["source"], "keywords": each["search"]}
+        )
+        # print(response.content)
+        content = response.content.replace("'", '"')
+        try:
+            res_dict = json.loads(content)
+            each["suggest"] = res_dict["keywords"]
+        except:
+            print("=" * 100)
+            print("재작업 필요")
+            print(content)
+            print("=" * 100)
+            each["suggest"] = ""
+        del each["search"]
+
+    down_df = pd.DataFrame(list_data)
+
+    down_df.to_excel("storage/suggest_test.xlsx", index=False)
 
     return True
