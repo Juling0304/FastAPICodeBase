@@ -8,6 +8,7 @@ Please filter out the terms that do not match the context, such as incorrect key
 Provide only the terms that are truly relevant to the content.
 Provide the response in JSON format.
 Please use double quotes (") instead of single quotes (') to comply with JSON rules.
+Please provide the response in JSON format without wrapping it in an "Output" field. Instead, return it directly in the format shown in the example response
 
 Example Input:
 {{
