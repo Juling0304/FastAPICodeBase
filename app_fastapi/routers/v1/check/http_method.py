@@ -14,7 +14,7 @@ from app_fastapi.prompts.check_ko_cn import (
     check_ko_cn_prompt_v3,
     check_ko_cn_prompt_v4,
 )
-from app_fastapi.schemas.check.request_http import SelectModel
+from app_fastapi.schemas.llm_list import SelectModel
 from typing import Union, Annotated
 import os, pandas as pd, json, asyncio
 
