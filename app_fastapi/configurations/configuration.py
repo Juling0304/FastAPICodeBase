@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     GPT_API_KEY: str
+    CLAUDE_API_KEY: str
     API_PORT: int
     APP_ENV: str
 

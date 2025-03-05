@@ -10,3 +10,4 @@ SUGGEST_PREFIX = "/suggest"
 MAIN_PREFIX = ""
 
 KEYWORD_PREFIX = "/keyword"
+CHECK_PREFIX = "/check"

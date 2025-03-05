@@ -18,6 +18,7 @@ app = FastAPI(
         {"name": tags.FILE_TAG},
         {"name": tags.KEYWORD_TAG},
         {"name": tags.SUGGEST_TAG},
+        {"name": tags.CHECK_TAG},
     ],
 )
 

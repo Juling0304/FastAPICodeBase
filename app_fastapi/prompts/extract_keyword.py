@@ -8,7 +8,7 @@ The criteria for extracting keywords are as follows:
 1. Extract Taekwondo-related technical terms (e.g., flying kick, backhand, etc.)
 2. Extract proper nouns (e.g., organization names, personal names, place names, textbook titles, etc.)
 3. Extract table of contents and titles, sub title
-4. Terms with Korean characters and Chinese characters in parentheses (e.g., definition(定義), training(訓鍊, training), ‘修’, acculturation（文化接變）)
+4. Terms with Korean characters and English characters in parentheses
 5. Terms within special symbols (e.g., <educational video>, 『Guanzi』, <Clementine>, (TigerJK), etc.)
 6. Exclude dates (e.g., 1995, 1982, 2023-10-05, December 25, etc.).
 
@@ -75,6 +75,33 @@ The key should be English
 
 Example response:
 {{"taekwondo": "태권도", "concept": "개념"}}
+
+
+Input:
+{long_text}
+""",
+)
+
+ko_en_prompt = PromptTemplate(
+    input_variables=["long_text"],
+    template="""Extract Korean keywords from the content of the input.
+The criteria for extracting keywords are as follows:
+
+1. Extract Taekwondo-related technical terms (e.g., flying kick, backhand, etc.)
+2. Extract proper nouns (e.g., organization names, personal names, place names, textbook titles, etc.)
+3. Extract table of contents and titles, sub title
+4. Terms with Korean characters and Chinese characters in parentheses (e.g., definition(定義), training(訓鍊, training), ‘修’, acculturation（文化接變）)
+5. Terms within special symbols (e.g., <educational video>, 『Guanzi』, <Clementine>, (TigerJK), etc.)
+6. Exclude dates (e.g., 1995, 1982, 2023-10-05, December 25, etc.).
+
+Extract the keywords according to the above criteria.
+Provide the response in JSON format.
+The key should be the extracted Korean keyword, and the value should be its corresponding translation in English.
+The key should be Korean
+
+
+Example response:
+{{"태권도": "taekwondo", "개념": "concept"}}
 
 
 Input:

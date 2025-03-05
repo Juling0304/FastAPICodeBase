@@ -6,9 +6,11 @@ suggest_prompt = PromptTemplate(
 The text contains terms that were matched to a glossary, but the accuracy is very low because it simply lists the matched terms.
 Please filter out the terms that do not match the context, such as incorrect keywords like "인," "대," "도," etc., which may have been matched erroneously.
 Provide only the terms that are truly relevant to the content.
+Do not extract words from the text yourself, instead only pass the words given in the keywords.
 Provide the response in JSON format.
 Please use double quotes (") instead of single quotes (') to comply with JSON rules.
-Please provide the response in JSON format without wrapping it in an "Output" field. Instead, return it directly in the format shown in the example response
+Must provide the response in JSON format without wrapping it in an "Output" field. Instead, return it directly in the format shown in the example response
+
 
 Example Input:
 {{

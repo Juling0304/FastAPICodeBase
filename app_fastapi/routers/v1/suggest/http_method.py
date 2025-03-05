@@ -40,33 +40,7 @@ async def http_post(
     json_str = search_df.to_json(orient="records", force_ascii=False)
     list_data = json.loads(json_str)
 
-    # 동기 방식으로 테스트
-    # i = 0
-    # for each in list_data:
-    #     print(f"{i + 1} 행 처리 시작 ...")
-    #     client = Clients.client_openai()
-    #     chain = suggest_prompt | client
-    #     response = chain.invoke(
-    #         {"korean_text": each["source"], "keywords": each["search"]}
-    #     )
-    #     # print(response.content)
-    #     content = response.content.replace("'", '"')
-    #     try:
-    #         res_dict = json.loads(content)
-    #         each["suggest"] = res_dict["keywords"]
-    #     except:
-    #         print("=" * 100)
-    #         print("재작업 필요")
-    #         print(content)
-    #         print("=" * 100)
-    #         each["suggest"] = ""
-
-    #     i += 1
-    #     del each["search"]
-
-    # 원하는 만큼의 코드는 아니지만 의도대로 돌아가기는 함.
-    # 다른 방법을 생각해봐야 함.
-    llm_client = Clients.client_openai()
+    llm_client = Clients.client_openai("gpt-3.5-turbo-1106")
     tasks = [
         process_suggest_each(llm_client, each, suggest_prompt) for each in list_data
     ]
