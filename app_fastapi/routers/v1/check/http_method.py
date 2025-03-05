@@ -30,10 +30,7 @@ async def http_post(file: UploadFile = File(...), llm_model: SelectModel = Query
     json_str = excel_df.to_json(orient="records", force_ascii=False)
     list_data = json.loads(json_str)
 
-    if "gpt" in llm_model:
-        llm_client = Clients.client_openai(llm_model)
-    elif "claude" in llm_model:
-        llm_client = Clients.client_anthropic(llm_model)
+    llm_client = Clients.make_client(llm_model)
 
     tasks = [
         process_check_each(llm_client, idx, each, check_ko_cn_prompt_v4)
