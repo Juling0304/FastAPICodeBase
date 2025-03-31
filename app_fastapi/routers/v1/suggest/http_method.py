@@ -17,7 +17,10 @@ async def http_post(
     업로드 엑셀 내용 읽어 용어 서치
     """
 
-    keyword_df = pd.read_csv("storage/keyword/ko_cn_keyword.csv", encoding="utf-8")
+    filename, extension = os.path.splitext(file.filename)
+
+    # keyword_df = pd.read_csv("storage/keyword/ko_cn_keyword.csv", encoding="utf-8")
+    keyword_df = pd.read_csv("storage/keyword/nuclear_keyword2.csv", encoding="utf-8")
     excel_df = pd.read_excel(file.file, engine="openpyxl")
 
     keyword_dict = dict(
@@ -51,6 +54,7 @@ async def http_post(
 
     down_df = pd.DataFrame(processed_data)
 
-    down_df.to_excel("storage/suggest_test.xlsx", index=False)
+    # down_df.to_excel(f"storage/{filename}suggest.xlsx", index=False)
+    down_df.to_excel(f"storage/too_long_suggest.xlsx", index=False)
 
     return True

@@ -12,6 +12,16 @@ class Settings(BaseSettings):
 
     REDIS_HOST_NAME: str
     REDIS_PORT: int
+
+    GOOGLE_OCR_PROJECT_ID: str
+    GOOGLE_OCR_PROCESSOR_ID: str
+    GOOGLE_OCR_LOCATION: str
+
+    NAVER_OCR_URL: str
+    NAVER_OCR_SECRET_KEY: str
+
+    UPSTAGE_OCR_API_KEY: str
+    UPSTAGE_OCR_URL: str
     # model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 

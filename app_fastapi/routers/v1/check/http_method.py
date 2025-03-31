@@ -42,7 +42,7 @@ async def http_post(file: UploadFile = File(...), llm_model: SelectModel = Query
     processed_data_sorted = [x[1] for x in processed_data_sorted]
     print("gather finish")
 
-    down_df = pd.DataFrame(processed_data)
+    down_df = pd.DataFrame(processed_data_sorted)
 
     down_df.to_excel(f"storage/{filename}_check.xlsx", index=False)
 
