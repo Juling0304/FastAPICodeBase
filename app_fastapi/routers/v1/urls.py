@@ -1,5 +1,6 @@
 ENDPOINT = ""
 ENDPOINT_SLASH = "/"
+RETRY = "/retry"
 
 API_V1_ROUTER_PREFIX = "/api/v1"
 
@@ -12,3 +13,4 @@ MAIN_PREFIX = ""
 
 KEYWORD_PREFIX = "/keyword"
 CHECK_PREFIX = "/check"
+GL_PREFIX = "/global_law"
