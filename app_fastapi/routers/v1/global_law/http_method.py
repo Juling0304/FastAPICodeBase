@@ -6,8 +6,8 @@ from typing import List
 import os, asyncio, pandas as pd, json
 from app_fastapi.utilities.parser.v3.parsers import Parsers as ParsersV3
 from app_fastapi.utilities.llm_util.v1.llm_util import Clients
-from app_fastapi.utilities.llm_util.v1.async_util import process_global_law_trans_each
-from app_fastapi.prompts.editor_trans import e_trans_prompt
+from app_fastapi.utilities.llm_util.v1.async_util import process_global_law_trans_each, process_global_law_check_each
+from app_fastapi.prompts.editor_trans import e_trans_prompt, e_check_prompt, e_keyword_prompt
 
 
 async def http_post(file: UploadFile = File(...),):
@@ -78,5 +78,55 @@ async def http_post_retry(file: UploadFile = File(...),):
         excel_df.loc[excel_df['target'].isin(updates_dict.keys()), 'trans'] = excel_df['target'].map(updates_dict).fillna(excel_df['trans'])
 
         excel_df.to_excel(f"storage/{filename}_retry.xlsx", index=False)
+
+    return True
+
+async def http_post_check(file: UploadFile = File(...),):
+    """
+    xlsx로 감수 프롬프트 작동
+    """
+    filename, extension = os.path.splitext(file.filename)
+    excel_df = pd.read_excel(file.file, engine="openpyxl")
+
+    excel_df["check"] = excel_df["check"].fillna("")
+    json_str = excel_df.to_json(orient="records", force_ascii=False)
+    list_data = json.loads(json_str)
+
+    tasks = []
+    llm_client = Clients.make_client("claude-3-7-sonnet-20250219")
+
+    for each in list_data:
+        if not each["check"]:
+            tasks.append(process_global_law_check_each(llm_client, {"target":each["target"], "trans": each["trans"]}, e_check_prompt))
+
+    if tasks:
+        processed_data = await asyncio.gather(*tasks)
+        updates_trans = {d['target']: d['trans'] for d in processed_data}
+        updates_check = {d['target']: d['check'] for d in processed_data}
+
+        excel_df.loc[excel_df['target'].isin(updates_trans.keys()), 'trans'] = excel_df['target'].map(updates_trans).fillna(excel_df['trans'])
+        excel_df.loc[excel_df['target'].isin(updates_check.keys()), 'check'] = excel_df['target'].map(updates_check).fillna(excel_df['check'])
+
+        excel_df.to_excel(f"storage/{filename}_check.xlsx", index=False)
+
+    return True
+
+
+async def http_post_keyword(file: UploadFile = File(...),):
+    filename, extension = os.path.splitext(file.filename)
+    excel_df = pd.read_excel(file.file, engine="openpyxl")
+    target_text = '\n'.join(excel_df['target'].astype(str).tolist())
+    trans_text = '\n'.join(excel_df['trans'].astype(str).tolist())
+
+    
+    llm_client = Clients.make_client("claude-3-7-sonnet-20250219")
+
+    chain = e_keyword_prompt | llm_client
+    response = await chain.ainvoke(
+        {"target": target_text, "trans": trans_text}
+    )
+    content = response.content.replace("'", '"')
+    res_dict = json.loads(content)
+    print(res_dict)
 
     return True

@@ -106,6 +106,7 @@ async def process_global_law_trans_each(llm_client: Clients, each: dict, prompt:
                 return each
             except Exception as e:
                 print("=" * 100)
+                print(content)
                 print("Rate limit 초과 또는 다른 오류 발생: ", str(e))
                 print("=" * 100)
                 if "rate limit" in str(e).lower():
@@ -119,4 +120,42 @@ async def process_global_law_trans_each(llm_client: Clients, each: dict, prompt:
                     each["trans"] = ""
                     return each
                 each["trans"] = ""
+        return each
+    
+
+async def process_global_law_check_each(llm_client: Clients, each: dict, prompt: PromptTemplate):
+    async with semaphore:
+        retry_count = 0
+        while retry_count < MAX_RETRIES:
+            try:
+                print("action")
+                chain = prompt | llm_client
+                response = await chain.ainvoke(
+                    {"target": each["target"], "trans": each["trans"]}
+                )
+                content = response.content.replace("'", '"')
+                # res_dict = json.loads(content)
+                each["check"] = content
+                if "[검토]" in each["check"]:
+                    each["trans"] = "[검토]" + each["trans"]
+                if "[장문]" in each["check"]:
+                    each["trans"] = "[장문]" + each["trans"]
+                return each
+            except Exception as e:
+                print("=" * 100)
+                print(content)
+                print("Rate limit 초과 또는 다른 오류 발생: ", str(e))
+                print("=" * 100)
+                if "rate limit" in str(e).lower():
+                    retry_count += 1
+                    print(
+                        f"잠시 {RATE_LIMIT_WAIT_TIME}초 대기 후 재시도합니다... (시도 {retry_count}/{MAX_RETRIES})"
+                    )
+                    await asyncio.sleep(RATE_LIMIT_WAIT_TIME)
+                else:
+                    print("오류가 발생하여 재시도를 중단합니다.")
+                    each["check"] = ""
+                    return each
+                each["check"] = ""
+
         return each

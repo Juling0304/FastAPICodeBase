@@ -17,3 +17,15 @@ router.post(
     name="global_law_retry",
     # response_model=ResponseTest,
 )(http_method.http_post_retry)
+router.post(
+    path=urls.CHECK_PREFIX,
+    tags=[tags.GL_TAG],
+    name="global_law_check",
+    # response_model=ResponseTest,
+)(http_method.http_post_check)
+router.post(
+    path=urls.KEYWORD_PREFIX,
+    tags=[tags.GL_TAG],
+    name="global_law_check",
+    # response_model=ResponseTest,
+)(http_method.http_post_keyword)
