@@ -22,6 +22,9 @@ class Settings(BaseSettings):
 
     UPSTAGE_OCR_API_KEY: str
     UPSTAGE_OCR_URL: str
+
+    VAPID_PUBLIC_KEY: str
+    VAPID_PRIVATE_KEY: str
     # model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
